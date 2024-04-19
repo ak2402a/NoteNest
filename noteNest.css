@@ -1,0 +1,184 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+/* Code for managing tabs */
+.tabcontent {
+    display: none;
+}
+
+#Home {
+    display: block;
+}
+/* Code for Nav bar in top right */ 
+.header, nav {
+    overflow: hidden;
+    background-color: #c2c0c0;
+    padding: 20px;
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: -4px 0px 6px rgba(0, 0, 0, 0.1);
+    border-bottom-left-radius: 20px;
+    border-top-left-radius: 20px;
+    display: inline-block;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+  
+.header a, .tablink {
+    float: left;
+    color: white;
+    text-align: center;
+    padding: 12px 16px;
+    text-decoration: none;
+    font-size: 18px;
+    line-height: 25px;
+    border-radius: 15px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, transform 0.3s;
+}
+  
+.header a:hover, .tablink:hover {
+    background-color: #3f90e2;
+    color: #fff;
+    transform: scale(1.05);
+}
+  
+.header a.active, .tablink.active {
+    background-color: #3f90e2;
+    color: #fff;
+}
+/* Reset default margin, set font family, and color */
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    color: #003c77;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
+    background-color: #f8f8f8; /* Slightly lighter background for better readability */
+}
+
+/* Common styles for header and tab content */
+.header, .tabcontent {
+    text-align: center;
+}
+
+/* Styles for submission form */
+.submission-form {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Margin bottom for form groups */
+.form-group {
+    margin-bottom: 15px;
+}
+
+/* Label display */
+.form-group label {
+    display: block;
+}
+
+/* Styles for time selection labels */
+.time-selection label {
+    display: inline-block;
+}
+
+/* Margin for select elements */
+.time-selection select {
+    margin: 0 5px;
+}
+
+/* Media Queries for responsiveness */
+@media (max-width: 768px) {
+    /* Adjust font size for title on small screens */
+    .title {
+        font-size: 18px;
+        content: center;
+        align-items: center; /* Slightly smaller font size on very small screens */
+    }
+
+    /* Adjust padding for header and nav on small screens */
+    .header, nav {
+        padding: 15px 5px; /* Reduce padding on small screens */
+    }
+
+    /* Adjust padding and font size for links on small screens */
+    .header a, .tablink {
+        padding: 10px 12px; /* Adjust padding for touch targets */
+        font-size: 16px; /* Adjust font size for small screens */
+    }
+}
+
+/* The Modal (background) */
+.modal {
+    justify-content: center;
+    align-items: center;
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  }
+  
+/* Modal Content/Box */
+.modal-content {
+justify-content: center; /* Aligns content horizontally to the center */
+align-items: center;    
+background-color: #fefefe;
+margin: 15% auto; /* 15% from the top and centered */
+padding: 20px;
+border: 1px solid #888;
+width: 80%; /* Could be more or less, depending on screen size */
+}
+
+.qrContainer {
+    display: flex;
+    justify-content: center; /* Centers content horizontally */
+    align-items: center;     /* Centers content vertically */
+}
+
+
+/* The Close Button */
+.close {
+color: #aaa;
+float: right;
+font-size: 28px;
+font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+color: black;
+text-decoration: none;
+cursor: pointer;
+}
+
+.bubble {
+background-color: #003c77;
+padding: 20px;
+border-radius: 20px;
+color: white;
+margin: 20px 10px;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+transition: background-color 0.3s, box-shadow 0.3s, transform 0.3s;
+/* Adjustments for content encapsulation */
+min-width: auto; /* Remove min-width restriction */
+max-width: auto; /* Remove max-width restriction */
+height: auto; /* Allow height to adjust based on content */
+text-align: left; /* Align text to the left */
+line-height: normal; /* Use normal line height for paragraphs */
+cursor: default; /* Default cursor instead of pointer */
+display: block; /* Block display for content encapsulation */
+}

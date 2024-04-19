@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="Images/NoteNest.jpeg">
+    <title>NoteNest</title>
+    <link rel="stylesheet" href="noteNest.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+    <script>
+        // JavaScript function to populate time options
+        function populateTimeOptions() {
+            const startTimeSelect = document.getElementById('startTime');
+            const endTimeSelect = document.getElementById('endTime');
+
+            startTimeSelect.innerHTML = '';
+            endTimeSelect.innerHTML = '';
+
+            const startTime = 9 * 60; // 9 AM in minutes
+            const endTime = 17 * 60;  // 5 PM in minutes
+
+            for (let i = startTime; i < endTime; i += 15) {
+                const hours = Math.floor(i / 60);
+                const minutes = i % 60;
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                const displayHours = hours % 12 === 0 ? 12 : hours % 12;
+                const timeString = `${displayHours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+
+                const optionStart = new Option(timeString, timeString);
+                const optionEnd = new Option(timeString, timeString);
+
+                startTimeSelect.appendChild(optionStart);
+                endTimeSelect.appendChild(optionEnd);
+            }
+        }
+
+        // Call the function to populate time options when the page is loaded
+        window.addEventListener('load', populateTimeOptions);
+
+        function filterRooms() {
+    const filter = document.getElementById("roomFilter").value;
+    const roomsContainer = document.getElementById("Practice Rooms");
+    let bubbles = Array.from(roomsContainer.getElementsByClassName("bubble"));
+
+    switch (filter) {
+        case "mostFrequent":
+            bubbles.sort((a, b) => {
+                let prosA = a.querySelectorAll('P')[0].textContent.match(/Pros:/g) || [];
+                let prosB = b.querySelectorAll('P')[0].textContent.match(/Pros:/g) || [];
+                return prosB.length - prosA.length;
+            });
+            break;
+        case "bestOverall":
+            bubbles.sort((a, b) => {
+                let scoreA = parseInt(a.querySelectorAll('P')[0].textContent.match(/\d+/)[0]);
+                let scoreB = parseInt(b.querySelectorAll('P')[0].textContent.match(/\d+/)[0]);
+                return scoreB - scoreA;
+            });
+            break;
+        case "resetOrder":
+            bubbles.sort((a, b) => {
+                let numberA = parseInt(a.querySelector('H2').textContent.match(/\d+/)[0]);
+                let numberB = parseInt(b.querySelector('H2').textContent.match(/\d+/)[0]);
+                return numberA - numberB;
+            });
+            break;
+        default:
+            // Do nothing if the default option is selected
+            return;
+    }
+
+    // Re-append bubbles to display them in the new order
+    bubbles.forEach(bubble => roomsContainer.appendChild(bubble));
+}
+</script>
+<script src="noteNest.js"></script>
+</head>
+<body>
+    <div class="header">
+        <!-- Code for the nav bar -->
+        <nav>
+            <button class="tablink" onclick="openTab('Home', this)">Home</button>
+            <button class="tablink" onclick="openTab('Practice Rooms', this)">Practice Rooms</button>
+            <button class="tablink" onclick="openTab('Info/Contact Us', this)">Info/Contact Us</button>
+        </nav>
+    </div>
+
+    <div id="Home" class="tabcontent">
+        <br><br><br>
+        <h1 class="submission-form">Welcome to NoteNest</h1>
+        <form id="reservationForm" class="submission-form">
+            <div class="form-group">
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" name="firstName" required>
+            </div>
+            <div class="form-group">
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" name="lastName" required>
+            </div>
+            <div class="form-group">
+                <label for="auId">AU ID:</label>
+                <input type="text" id="auId" name="auId" pattern="[A-Za-z0-9]{7}" title="AU ID should be 7 characters long." required>
+            </div>
+            <div class="form-group">
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+            <div class="form-group time-selection">
+                <label for="startTime">Start Time:</label>
+                <select id="startTime" name="startTime"></select>
+                <label for="endTime">End Time:</label>
+                <select id="endTime" name="endTime"></select>
+            </div>
+            <div class="form-group">
+                <label for="roomNumber">Room Number:</label>
+                <input type="text" id="roomNumber" name="roomNumber" required>
+            </div>
+            <input type="submit" value="Submit">
+        </form>
+    <script src="noteNest.js"></script>
+    <!-- The Modal -->
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p id="modalText">Some text in the Modal..</p>
+            <div id="qrContainer" style="display: flex; justify-content: center; align-items: center;"></div>
+            <button id="cancelReservation">Cancel Reservation</button>
+            <button id="Feedback">Feedback</button>
+        </div>
+    </div>
+
+    <div id="cancellationModal" class="modal">
+        <div class="modal-content">
+            <span class="closeCancellation">&times;</span>
+            <p id="cancellationText">Your reservation has been successfully canceled.</p>
+        </div>
+    </div>
+
+    <div id="feedbackModal" class="modal">
+        <div class="modal-content">
+            <span class="closeFeedback">&times;</span>
+            <h3>Feedback Survey</h3>
+            <form id="feedbackForm">
+                <label for="feedbackRoomNumber">Room Number:</label>
+                <input type="text" id="feedbackRoomNumber" name="roomNumber" required><br>
+    
+                <label for="feedbackScore">Score (0-100):</label>
+                <input type="number" id="feedbackScore" name="score" min="0" max="100" required><br>
+    
+                <label for="feedbackPros">Pros:</label>
+                <textarea id="feedbackPros" name="pros" required></textarea><br>
+    
+                <label for="feedbackCons">Cons:</label>
+                <textarea id="feedbackCons" name="cons" required></textarea><br>
+    
+                <label for="serviceRequired">Does this room require service?</label>
+                <input type="checkbox" id="serviceRequired" name="serviceRequired"><br>
+    
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<div id="Practice Rooms" class="tabcontent">
+    <br>
+    <br>
+    <br>
+    <h1 class="submission-form">Welcome to Katzens Practice Rooms</h1>
+    <h3 class="submission-form">Below you will find a labeled map of the practice rooms</h3>
+    <!--Image for practice rooms-->
+    <select id="roomFilter" onchange="filterRooms()">
+        <option value="default">Select Filter</option>
+        <option value="mostFrequent">Most Frequently Used</option>
+        <option value="bestOverall">Best Overall Score</option>
+        <option value="resetOrder">Reset Order</option>
+    </select>
+    <div class="bubble">
+        <H2>Practice Room 1:</H2>
+        <P>Score: 86 <br>
+            Pros: Piano is correctly tuned <br>
+            Cons: Ceiling tile is caving in!
+        </P> 
+    </div>
+    <div class="bubble">
+        <H2>Practice Room 2:</H2>
+        <P>Score: 10 <br>
+            Pros: Piano is correctly tuned <br>
+            Cons: Ceiling tile is caving in!
+        </P> 
+    </div>
+    <div class="bubble">
+        <H2>Practice Room 3:</H2>
+        <P>Score: 33 <br>
+            Pros: Piano is correctly tuned <br>
+            Cons: Ceiling tile is caving in!
+        </P> 
+    </div>
+    <div class="bubble">
+        <H2>Practice Room 4:</H2>
+        <P>Score: 17 <br>
+            Pros: Piano is correctly tuned <br>
+            Cons: Ceiling tile is caving in!
+        </P> 
+    </div>
+    <div class="bubble">
+        <H2>Practice Room 5:</H2>
+        <P>Score: 93 <br>
+            Pros: Piano is correctly tuned <br>
+            Cons: Ceiling tile is caving in!
+        </P> 
+    </div>
+    <div class="bubble">
+        <H2>Practice Room 6:</H2>
+        <P>Score: 40 <br>
+            Pros: Piano is correctly tuned <br>
+            Cons: Ceiling tile is caving in!
+        </P> 
+    </div>
+    <div class="bubble">
+        <H2>Practice Room 7:</H2>
+        <P>Score: 27 <br>
+            Pros: Piano is correctly tuned <br>
+            Cons: Ceiling tile is caving in!
+        </P> 
+    </div>
+    <div class="bubble">
+        <H2>Practice Room 8:</H2>
+        <P>Score: 85 <br>
+            Pros: Piano is correctly tuned <br>
+            Cons: Ceiling tile is caving in!
+        </P> 
+    </div>
+    <div class="bubble">
+        <H2>Practice Room 9:</H2>
+        <P>Score: 99 <br>
+            Pros: Piano is correctly tuned <br>
+            Cons: Ceiling tile is caving in!
+        </P> 
+    </div>
+    <div class="bubble">
+        <H2>Practice Room 10:</H2>
+        <P>Score: 77 <br>
+            Pros: Piano is correctly tuned <br>
+            Cons: Ceiling tile is caving in!
+        </P> 
+    </div>
+</div>
+</body>
+</html>
