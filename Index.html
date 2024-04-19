@@ -8,36 +8,36 @@
     <link rel="stylesheet" href="noteNest.css">
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
     <script>
-        // JavaScript function to populate time options
-        function populateTimeOptions() {
-            const startTimeSelect = document.getElementById('startTime');
-            const endTimeSelect = document.getElementById('endTime');
+    // JavaScript function to populate time options
+    function populateTimeOptions() {
+        const startTimeSelect = document.getElementById('startTime');
+        const endTimeSelect = document.getElementById('endTime');
 
-            startTimeSelect.innerHTML = '';
-            endTimeSelect.innerHTML = '';
+        startTimeSelect.innerHTML = '';
+        endTimeSelect.innerHTML = '';
 
-            const startTime = 9 * 60; // 9 AM in minutes
-            const endTime = 17 * 60;  // 5 PM in minutes
+        const startTime = 9 * 60; // 9 AM in minutes
+        const endTime = 17 * 60;  // 5 PM in minutes
 
-            for (let i = startTime; i < endTime; i += 15) {
-                const hours = Math.floor(i / 60);
-                const minutes = i % 60;
-                const ampm = hours >= 12 ? 'PM' : 'AM';
-                const displayHours = hours % 12 === 0 ? 12 : hours % 12;
-                const timeString = `${displayHours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+        for (let i = startTime; i < endTime; i += 15) {
+            const hours = Math.floor(i / 60);
+            const minutes = i % 60;
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 === 0 ? 12 : hours % 12;
+            const timeString = `${displayHours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
 
-                const optionStart = new Option(timeString, timeString);
-                const optionEnd = new Option(timeString, timeString);
+            const optionStart = new Option(timeString, timeString);
+            const optionEnd = new Option(timeString, timeString);
 
-                startTimeSelect.appendChild(optionStart);
-                endTimeSelect.appendChild(optionEnd);
-            }
+            startTimeSelect.appendChild(optionStart);
+            endTimeSelect.appendChild(optionEnd);
         }
+    }
 
-        // Call the function to populate time options when the page is loaded
-        window.addEventListener('load', populateTimeOptions);
+    // Call the function to populate time options when the page is loaded
+    window.addEventListener('load', populateTimeOptions);
 
-        function filterRooms() {
+    function filterRooms() {
     const filter = document.getElementById("roomFilter").value;
     const roomsContainer = document.getElementById("Practice Rooms");
     let bubbles = Array.from(roomsContainer.getElementsByClassName("bubble"));
@@ -71,7 +71,7 @@
 
     // Re-append bubbles to display them in the new order
     bubbles.forEach(bubble => roomsContainer.appendChild(bubble));
-}
+    }
 </script>
 <script src="noteNest.js"></script>
 </head>
