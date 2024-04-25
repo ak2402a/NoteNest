@@ -36,7 +36,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
         saveReservation(formData);
         event.target.reset();
-        alert('Reservation submitted!');
     }
 
     function saveReservation(data) {
@@ -78,7 +77,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
         cancelBtn.onclick = function() {
             cancelReservation(reservationId);
             modal.style.display = "none";
-            alert('Reservation cancelled.');
         };
 
         const feedbackBtn = document.getElementById("Feedback");
@@ -123,8 +121,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
             localStorage.setItem(`room-${roomNumber}`, JSON.stringify(roomData));
         
             updateRoomContent(roomNumber, roomData);
-        
-            alert("Feedback submitted!");
             document.getElementById("feedbackModal").style.display = "none";
         });
         
