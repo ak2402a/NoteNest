@@ -77,18 +77,19 @@ document.addEventListener('DOMContentLoaded', (event) => {
         document.getElementById("Feedback").onclick = () => document.getElementById("feedbackModal").style.display = "block";
         document.getElementById("feedbackForm").addEventListener("submit", handleFeedback);
     }
-
+    
     function handleFeedback(event) {
         event.preventDefault();
-        const formData = {
+        const feedbackData = {
             roomNumber: document.getElementById("feedbackRoomNumber").value,
             score: parseInt(document.getElementById("feedbackScore").value),
             pros: document.getElementById("feedbackPros").value,
             cons: document.getElementById("feedbackCons").value,
         };
 
-        updateRoomFeedback(formData);
+        updateRoomFeedback(feedbackData);
         document.getElementById("feedbackModal").style.display = "none";
+        document.getElementById("feedbackForm").reset(); // Reset the form fields
     }
 
     function updateRoomFeedback({ roomNumber, score, pros, cons }) {
@@ -104,17 +105,14 @@ document.addEventListener('DOMContentLoaded', (event) => {
         const avgScore = roomData.scores.reduce((a, b) => a + b, 0) / roomData.scores.length;
         const prosText = roomData.pros.join('<br>');
         const consText = roomData.cons.join('<br>');
-    
-        // Find the correct practice room `h2` based on room number and update its content
+
         const bubbles = document.querySelectorAll(".bubble h2");
         bubbles.forEach((h2) => {
             if (h2.textContent.includes(`Practice Room ${roomNumber}:`)) {
                 const bubble = h2.parentElement;
                 bubble.innerHTML = `
                     <h2>Practice Room ${roomNumber}:</h2>
-                    <p>Score: ${avgScore.toFixed(2)} <br>
-                        Pros: ${prosText} <br>
-                        Cons: ${consText}</p>
+                    <p>Score: ${avgScore.toFixed(2)} <br> Pros: ${prosText} <br> Cons: ${consText}</p>
                 `;
             }
         });
