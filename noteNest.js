@@ -90,6 +90,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         updateRoomFeedback(feedbackData);
         document.getElementById("feedbackModal").style.display = "none";
         document.getElementById("feedbackForm").reset(); // Reset the form fields
+        alert("Thank you for your feedback!");
     }
 
     function updateRoomFeedback({ roomNumber, score, pros, cons }) {
