@@ -104,13 +104,19 @@ document.addEventListener('DOMContentLoaded', (event) => {
         const avgScore = roomData.scores.reduce((a, b) => a + b, 0) / roomData.scores.length;
         const prosText = roomData.pros.join('<br>');
         const consText = roomData.cons.join('<br>');
-
-        document.querySelectorAll(`.bubble h2[data-room-number="${roomNumber}"]`).forEach(h2 => {
-            const bubble = h2.parentElement;
-            bubble.innerHTML = `
-                <h2>Practice Room ${roomNumber}:</h2>
-                <p>Score: ${avgScore.toFixed(2)} <br> Pros: ${prosText} <br> Cons: ${consText}</p>
-            `;
+    
+        // Find the correct practice room `h2` based on room number and update its content
+        const bubbles = document.querySelectorAll(".bubble h2");
+        bubbles.forEach((h2) => {
+            if (h2.textContent.includes(`Practice Room ${roomNumber}:`)) {
+                const bubble = h2.parentElement;
+                bubble.innerHTML = `
+                    <h2>Practice Room ${roomNumber}:</h2>
+                    <p>Score: ${avgScore.toFixed(2)} <br>
+                        Pros: ${prosText} <br>
+                        Cons: ${consText}</p>
+                `;
+            }
         });
     }
 
