@@ -54,13 +54,27 @@ document.addEventListener('DOMContentLoaded', (event) => {
     }
 
     function saveReservation(data) {
-        const reservationId = `reservation-${Date.now()}`; // Unique ID for the reservation
-        let roomReservations = JSON.parse(localStorage.getItem(`reservations-room-${data.roomNumber}`)) || [];
-        roomReservations.push(data);
-        localStorage.setItem(`reservations-room-${data.roomNumber}`, JSON.stringify(roomReservations)); // Store by room number
-        console.log('Reservation data saved:', data);
-        displayConfirmation(data, reservationId);
-        displayRoomAvailability(data.date); // Refresh availability display after saving the reservation
+        // First, check if the room is already booked at the given date and time.
+        if (isRoomAvailable(data.roomNumber, data.date, convertTimeToMinutes(data.startTime), convertTimeToMinutes(data.endTime))) {
+            const reservationId = `reservation-${Date.now()}`; // Unique ID for the reservation
+            let roomReservations = JSON.parse(localStorage.getItem(`reservations-room-${data.roomNumber}`)) || [];
+            roomReservations.push(data);
+            localStorage.setItem(`reservations-room-${data.roomNumber}`, JSON.stringify(roomReservations)); // Store by room number
+            console.log('Reservation data saved:', data);
+            displayConfirmation(data, reservationId);
+            displayRoomAvailability(data.date); // Refresh availability display after saving the reservation
+        } else {
+            alert("The room is already booked for the specified time. Please select another time or room.");
+        }
+    }
+    
+    function isRoomAvailable(roomNumber, date, startTime, endTime) {
+        const reservations = JSON.parse(localStorage.getItem(`reservations-room-${roomNumber}`)) || [];
+        return !reservations.some(reservation => {
+            const reservationStart = convertTimeToMinutes(reservation.startTime);
+            const reservationEnd = convertTimeToMinutes(reservation.endTime);
+            return reservation.date === date && (startTime < reservationEnd && endTime > reservationStart);
+        });
     }
 
     function displayConfirmation(reservationData, reservationId) {
