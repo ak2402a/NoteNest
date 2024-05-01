@@ -20,6 +20,13 @@ function openTab(tabName, elmnt) {
 
 document.addEventListener('DOMContentLoaded', (event) => {
     populateTimeLabels();
+    const confirmationModal = document.getElementById('confirmationModal');
+    const feedbackModal = document.getElementById('feedbackModal');
+    const cancellationModal = document.getElementById('cancellationModal');
+
+    if (confirmationModal) setupModalCloseHandlers(confirmationModal);
+    if (feedbackModal) setupModalCloseHandlers(feedbackModal);
+    if (cancellationModal) setupModalCloseHandlers(cancellationModal);
 
     const form = document.getElementById('reservationForm');
     if (form) {
@@ -38,31 +45,42 @@ document.addEventListener('DOMContentLoaded', (event) => {
     }
 
     function handleSubmit(event) {
-        event.preventDefault(); // Prevent the default form submission behavior
+        event.preventDefault(); // Prevent default form submission
+    
+        // Gather form data
         const formData = {
-            firstName: document.getElementById('firstName').value,
-            lastName: document.getElementById('lastName').value,
-            auId: document.getElementById('auId').value,
-            date: document.getElementById('date').value,
-            startTime: document.getElementById('startTime').value,
-            endTime: document.getElementById('endTime').value,
-            roomNumber: document.getElementById('roomNumber').value,
+            firstName: document.getElementById('firstName').value.trim(),
+            lastName: document.getElementById('lastName').value.trim(),
+            auId: document.getElementById('auId').value.trim(),
+            date: document.getElementById('date').value.trim(),
+            startTime: document.getElementById('startTime').value.trim(),
+            endTime: document.getElementById('endTime').value.trim(),
+            roomNumber: document.getElementById('roomNumber').value.trim(),
         };
-
+    
+        // Validate form data
+        if (!isValidReservation(formData)) {
+            return; // Stop processing if data is invalid
+        }
+    
         saveReservation(formData);
-        event.target.reset(); // Reset the form fields
+        event.target.reset(); // Reset form fields after processing
+    }
+    
+    function isValidReservation(data) {
+        return data.firstName && data.lastName && data.auId && data.date && data.startTime && data.endTime && data.roomNumber;
     }
 
     function saveReservation(data) {
-        // First, check if the room is already booked at the given date and time.
         if (isRoomAvailable(data.roomNumber, data.date, convertTimeToMinutes(data.startTime), convertTimeToMinutes(data.endTime))) {
             const reservationId = `reservation-${Date.now()}`; // Unique ID for the reservation
+            data.id = reservationId; // Ensure this is the only place the reservation ID is set
             let roomReservations = JSON.parse(localStorage.getItem(`reservations-room-${data.roomNumber}`)) || [];
             roomReservations.push(data);
-            localStorage.setItem(`reservations-room-${data.roomNumber}`, JSON.stringify(roomReservations)); // Store by room number
+            localStorage.setItem(`reservations-room-${data.roomNumber}`, JSON.stringify(roomReservations));
             console.log('Reservation data saved:', data);
             displayConfirmation(data, reservationId);
-            displayRoomAvailability(data.date); // Refresh availability display after saving the reservation
+            displayRoomAvailability(data.date);
         } else {
             alert("The room is already booked for the specified time. Please select another time or room.");
         }
@@ -79,6 +97,11 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     function displayConfirmation(reservationData, reservationId) {
         const modal = document.getElementById("confirmationModal");
+        if (modal) { // Check if modal exists before setting up handlers
+            setupModalCloseHandlers(modal);
+        } else {
+            console.error("Modal element not found!");
+        }
         modal.style.display = "block";
 
         const modalText = document.getElementById("modalText");
@@ -91,17 +114,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             height: 128
         });
 
-        setupModalCloseHandlers(modal);
         setupFeedbackAndCancellationHandlers(reservationId);
-    }
-
-    function setupModalCloseHandlers(modal) {
-        modal.querySelector(".close").onclick = () => modal.style.display = 'none';
-        window.onclick = (event) => {
-            if (event.target === modal) {
-                modal.style.display = 'none';
-            }
-        };
     }
 
     function setupFeedbackAndCancellationHandlers(reservationId) {
@@ -159,28 +172,42 @@ document.addEventListener('DOMContentLoaded', (event) => {
     }
 
     function cancelReservation(reservationId) {
-        const reservationData = JSON.parse(localStorage.getItem(reservationId));
-        if (!reservationData) {
-            console.log("No reservation found with ID:", reservationId);
-            return;
+        let found = false;
+        // Check all rooms for the reservation ID
+        for (let roomNumber = 1; roomNumber <= 10; roomNumber++) {
+            let roomReservations = JSON.parse(localStorage.getItem(`reservations-room-${roomNumber}`)) || [];
+            const index = roomReservations.findIndex(reservation => reservation.id === reservationId);
+            if (index !== -1) {
+                roomReservations.splice(index, 1); // Remove the reservation
+                localStorage.setItem(`reservations-room-${roomNumber}`, JSON.stringify(roomReservations));
+                console.log("Reservation cancelled with ID:", reservationId);
+                displayCancellation(); // Assuming displayCancellation handles the UI update
+                found = true;
+                break;
+            }
         }
-        localStorage.removeItem(reservationId);
-        displayCancellation(reservationData);
+        if (!found) {
+            console.error("No reservation found with ID:", reservationId);
+            alert("No reservation found with ID: " + reservationId);
+        }
     }
 
     function displayCancellation(reservationData) {
         const modal = document.getElementById("cancellationModal");
+        if (modal) { // Check if modal exists before setting up handlers
+            setupModalCloseHandlers(modal);
+        } else {
+            console.error("Modal element not found!");
+        }
         modal.style.display = "block";
 
         const cancellationText = document.getElementById("cancellationText");
         cancellationText.innerHTML = `Reservation for ${reservationData.firstName} ${reservationData.lastName} on ${reservationData.date} has been canceled.`;
-
-        setupModalCloseHandlers(modal);
     }
 
     function isBooked(roomNumber, date, startTime) {
         const reservations = JSON.parse(localStorage.getItem(`reservations-room-${roomNumber}`)) || [];
-        console.log('Checking reservations for room', roomNumber, 'on', date, 'at', startTime);
+        //console.log('Checking reservations for room', roomNumber, 'on', date, 'at', startTime);
         // Assuming startTime is a number like 540 (for 9:00 AM), 570 (for 9:30 AM), etc.
         return reservations.some(reservation => {
             const reservationStart = convertTimeToMinutes(reservation.startTime);
@@ -216,7 +243,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 timeBlock.className = 'timeBlock';
                 if (isBooked(roomNumber, date, time)) {
                     timeBlock.style.backgroundColor = 'grey'; // Mark as booked
-                    console.log(`Booking found: Room ${roomNumber}, Time ${time}`);
+                    //console.log(`Booking found: Room ${roomNumber}, Time ${time}`);
                 }
                 daySchedule.appendChild(timeBlock);
             }
@@ -248,3 +275,20 @@ document.addEventListener('DOMContentLoaded', (event) => {
         }
     }
 });
+
+//After DOM Loaded to prevent errors
+function setupModalCloseHandlers(modal) {
+    // Close button for the modal
+    const closeButton = modal.querySelector('.closeCancellation, .closeFeedback');
+
+    closeButton.addEventListener('click', function() {
+        modal.style.display = 'none';
+    });
+
+    // Close the modal when clicking outside of it
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+}
